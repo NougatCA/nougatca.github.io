@@ -1,0 +1,673 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Changan NIU">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="左值和右值C++中有左值（lvalue）和右值（rvalue），简单来说，左值是一个对象的引用，而右值是一个值。 左值是一个表达式，它产生一个对象的引用，比如变量名，一个数组下标的引用，一个解除引用后的指针（dereferenced pointer），或一个返回方法引用的方法调用。左值在内存中必定存在一个确定的位置，从而我们可以得到它的地址。 右值是不是左值的表达式，例如literals，大部分操">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++中的左值和右值">
+<meta property="og:url" content="http://example.com/2023/01/03/cpp-lr-value/index.html">
+<meta property="og:site_name" content="nougatca的博客">
+<meta property="og:description" content="左值和右值C++中有左值（lvalue）和右值（rvalue），简单来说，左值是一个对象的引用，而右值是一个值。 左值是一个表达式，它产生一个对象的引用，比如变量名，一个数组下标的引用，一个解除引用后的指针（dereferenced pointer），或一个返回方法引用的方法调用。左值在内存中必定存在一个确定的位置，从而我们可以得到它的地址。 右值是不是左值的表达式，例如literals，大部分操">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-01-03T06:18:51.000Z">
+<meta property="article:modified_time" content="2023-01-03T09:57:45.895Z">
+<meta property="article:author" content="Changan NIU">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>C++中的左值和右值 - nougatca的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Chang&#39;an</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="C++中的左值和右值"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-01-03 14:18" pubdate>
+          2023年1月3日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          38 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">C++中的左值和右值</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="左值和右值"><a href="#左值和右值" class="headerlink" title="左值和右值"></a>左值和右值</h1><p>C++中有左值（lvalue）和右值（rvalue），简单来说，左值是一个对象的引用，而右值是一个值。</p>
+<p>左值是一个表达式，它产生一个对象的引用，比如变量名，一个数组下标的引用，一个解除引用后的指针（dereferenced pointer），或一个返回方法引用的方法调用。左值在内存中必定存在一个确定的位置，从而我们可以得到它的地址。</p>
+<p>右值是不是左值的表达式，例如literals，大部分操作符的结果，或者返回非引用的方法调用。右值并不需要在内存中右确切的地址。</p>
+<p>在C++中，一个值要么是右值，要么是左值，左值是指表达式结束后依然存在的持久化对象，右值是指表达式结束时就不再存在的临时对象。所有的具名变量或者对象都是左值，而右值不具名。</p>
+<p>只有左值可以出现在赋值符号（&#x3D;）的左边，而左值和右值均可以出现在赋值符号的右边。</p>
+<p>当一个对象被用作左值时，使用的是它的引用（地址），被用作右值时，使用的是它的值。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-type">int</span> x = <span class="hljs-number">1</span>;      <span class="hljs-comment">// x是左值，1是右值，这里将1赋值给x，使用的是1的值，储存在x的地址中。</span><br><span class="hljs-type">int</span> y = x;      <span class="hljs-comment">// y是左值，x是右值，这里x成为了左值，实际使用的是它的值（1），储存在y的地址中。</span><br><span class="hljs-number">1</span> = x;          <span class="hljs-comment">// 错误，1是literal，只能是右值。</span><br>(x + <span class="hljs-number">1</span>) = <span class="hljs-number">2</span>;    <span class="hljs-comment">// 错误，x+1可以看做是一个内嵌方法，它返回的是一个值（2），同样是literal。</span><br></code></pre></td></tr></table></figure>
+
+<p>但并不是所有的方法都只能当作右值，一个方法可以通过它返回的对象类型进行判断，当这个方法返回一个非引用的对象时，它是右值，返回引用时，是左值。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-type">int</span> GLOBAL_VAR = <span class="hljs-number">0</span>;<br><br><span class="hljs-function"><span class="hljs-type">int</span>&amp; <span class="hljs-title">foo</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">return</span> GLOBAL_VAR;  <span class="hljs-comment">// 返回的是GLOBAL_VAR的引用</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-built_in">foo</span>() = <span class="hljs-number">1</span>;  <span class="hljs-comment">// 正确，foo返回的是引用，可以作为左值。</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这样一来，我们可以使用左值和右值来解释一些现象。例如++操作，++i是自增操作，这个表达式是将i的值加一，然后返回i，这时返回的是加一之后i的地址，所以++i是一个左值表达式。相反，后自增i++返回的是i+1的结果值，是一个临时变量，而i的值不会发生变化，所以i++是一个右值表达式。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-type">int</span> i = <span class="hljs-number">0</span>, j;<br>j = ++i;        <span class="hljs-comment">// i=1，j=1</span><br>j = i++;        <span class="hljs-comment">// i=1，j=2</span><br>j = (++i)++;    <span class="hljs-comment">// i=2，j=3，++i返回的是i的地址，是左值表达式，可以进行后自增操作</span><br>j = (i++)++;    <span class="hljs-comment">// 错误，i++返回的是一个值，是右值表达式，右值表达式不能进行后自增操作</span><br></code></pre></td></tr></table></figure>
+
+<p>值得注意的是，如果一个变量在声明为常量（const），它虽然在内存中有确切的地址，但是它不可修改，不可出现在赋值符号的左边。此外，有些地方说左值可以被修改，而右值不能，这是不严谨的。右值引用的出现使得右值也可以被修改。</p>
+<h1 id="左值引用和右值引用"><a href="#左值引用和右值引用" class="headerlink" title="左值引用和右值引用"></a>左值引用和右值引用</h1><h2 id="左值引用"><a href="#左值引用" class="headerlink" title="左值引用"></a>左值引用</h2><p>有些人定义左值为，一个在内存中有地址的表达式，我们可以通过”&amp;”获取它的地址。因此，左值引用就是对左值的引用，我们使用&amp;符号获取它的地址。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-type">int</span> i = <span class="hljs-number">1</span>;<br>i = <span class="hljs-number">2</span>;              <span class="hljs-comment">// 正确，i是左值</span><br><span class="hljs-type">int</span>* p = &amp;i;        <span class="hljs-comment">// 正确，&amp;i取i的地址，用指针p指向该地址</span><br><span class="hljs-function"><span class="hljs-type">int</span>&amp; <span class="hljs-title">foo</span><span class="hljs-params">()</span></span>;         <span class="hljs-comment">// foo()的返回值是一个引用，因此它是左值</span><br><span class="hljs-built_in">foo</span>() = <span class="hljs-number">1</span>;          <span class="hljs-comment">// 正确，foo()是一个左值</span><br><span class="hljs-type">int</span>* p1 = &amp;<span class="hljs-built_in">foo</span>();   <span class="hljs-comment">// 正确，&amp;取foo()的地址，用指针p1指向该地址</span><br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">foo1</span><span class="hljs-params">()</span></span>;         <span class="hljs-comment">// foo1的返回值为literal，是一个右值</span><br><span class="hljs-type">int</span> j = <span class="hljs-number">1</span>;<br>j = <span class="hljs-built_in">foo1</span>();         <span class="hljs-comment">// 正确，foo1是右值</span><br><span class="hljs-type">int</span>* p2 = &amp;<span class="hljs-built_in">foo1</span>();  <span class="hljs-comment">// 错误，&amp;并不能取右值的地址</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="右值引用"><a href="#右值引用" class="headerlink" title="右值引用"></a>右值引用</h2><p>而右值引用则是两个&amp;，即&amp;&amp;。右值引用是C++11标准中出现的新特性，它和相关的移动语义概念的出现可以在某种程度上避免一些不必要的复制，从而提高效率。</p>
+<p>右值引用，用以引用一个右值，可以延长右值的生命期，因为我们在上面说到，右值在表达式结束后将不存在，而使用右值引用，就可以使其继续存在，从而充分使用临时变量，或者即将不使用的变量即右值的资源，减少不必要的拷贝，提高效率。</p>
+<p>关于右值引用的介绍，我觉得<a target="_blank" rel="noopener" href="https://nettee.github.io/posts/2018/Understanding-lvalues-and-rvalues-in-C-and-C/">这篇博客</a>解释的很好，我用它的例子解释一下。</p>
+<p>首先，我们想要实现一个整数的vector类，那么我们可以这样定义。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">IntVec</span><br>&#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">IntVec</span><span class="hljs-params">(<span class="hljs-type">size_t</span> num = <span class="hljs-number">0</span>)</span></span><br><span class="hljs-function">        : m_size(num), m_data(new int[m_size])</span><br><span class="hljs-function">    &#123;</span><br>        <span class="hljs-built_in">log</span>(<span class="hljs-string">&quot;constructor&quot;</span>);     <span class="hljs-comment">// 构造函数，参数是int，构建一个长度为num的向量</span><br>    &#125;<br><br>    ~<span class="hljs-built_in">Intvec</span>()<br>    &#123;<br>        <span class="hljs-built_in">log</span>(<span class="hljs-string">&quot;destructor&quot;</span>);      <span class="hljs-comment">// 析构函数</span><br>        <span class="hljs-keyword">if</span> (m_data)<br>        &#123;<br>            <span class="hljs-keyword">delete</span>[] m_data;<br>            m_data = <span class="hljs-number">0</span>;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-built_in">IntVec</span>(<span class="hljs-type">const</span> IntVec&amp; other)<br>        : <span class="hljs-built_in">m_size</span>(other.m_size), <span class="hljs-built_in">m_data</span>(<span class="hljs-keyword">new</span> <span class="hljs-type">int</span>[m_size])<br>    &#123;<br>        <span class="hljs-built_in">log</span>(<span class="hljs-string">&quot;copy constructor&quot;</span>);<br>        <span class="hljs-comment">// 拷贝构造函数，参数是另一个IntVec实例，实现深拷贝，将参数中的向量的每个元素复制到该向量中</span><br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; m_size; ++i)<br>            m_data[i] = other.m_data[i];<br>    &#125;<br><br>    IntVec&amp; <span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> Intvec&amp; other)<br>    &#123;<br>        <span class="hljs-comment">// 重载=操作符，也是深拷贝，先用上面的拷贝构造函数拷贝一个tmp，然后用swap拷贝数据</span><br>        <span class="hljs-built_in">log</span>(<span class="hljs-string">&quot;copy assignment operator&quot;</span>);<br>        <span class="hljs-function">IntVec <span class="hljs-title">tmp</span><span class="hljs-params">(other)</span></span>;<br>        std::<span class="hljs-built_in">swap</span>(m_size, tmp.m_size);<br>        std::<span class="hljs-built_in">swap</span>(m_data, tmp.m_data);<br>        <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;<br>    &#125;<br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">log</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* msg)</span></span><br><span class="hljs-function">    </span>&#123;<br>        cout &lt;&lt; <span class="hljs-string">&quot;[&quot;</span> &lt;&lt; <span class="hljs-keyword">this</span> &lt;&lt; <span class="hljs-string">&quot;] &quot;</span> &lt;&lt; msg &lt;&lt; <span class="hljs-string">&quot;\n&quot;</span>;<br>    &#125;<br><br>    <span class="hljs-type">size_t</span> m_size;<br>    <span class="hljs-type">int</span>* m_data;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>每个成员方法都有调用了log方法，我们可以通过这样查看每个方法的调用情况。</p>
+<p>首先，我们运行一个将v1实例的内容用重载后的&#x3D;号拷贝到v2的操作。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">IntVec <span class="hljs-title">v1</span><span class="hljs-params">(<span class="hljs-number">20</span>)</span></span>;<br>IntVec v2;<br><br>cout &lt;&lt; <span class="hljs-string">&quot;assigning lvalue...\n&quot;</span>;<br>v2 = v1;<br>cout &lt;&lt; <span class="hljs-string">&quot;ended assigning lvalue...\n&quot;</span>;<br></code></pre></td></tr></table></figure>
+
+<p>结果是</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs oxygene">assigning lvalue...<br>[<span class="hljs-number">0</span>x28fef8] <span class="hljs-keyword">copy</span> assignment <span class="hljs-keyword">operator</span><br>[<span class="hljs-number">0</span>x28fec8] <span class="hljs-keyword">copy</span> <span class="hljs-keyword">constructor</span><br>[0<span class="hljs-title function_">x28fec8</span>] <span class="hljs-title function_">destructor</span><br><span class="hljs-title function_">ended</span> <span class="hljs-title function_">assigning</span> <span class="hljs-title function_">lvalue</span>...<br></code></pre></td></tr></table></figure>
+
+<p>可以看到，首先调用了重载&#x3D;的方法，然后用拷贝构造方法构造tmp，swap数据，最后析构tmp。</p>
+<p>十分正常，但是如果我们将一个右值赋值给v2。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp">cout &lt;&lt; <span class="hljs-string">&quot;assigning rvalue...\n&quot;</span>;<br>v2 = <span class="hljs-built_in">IntVec</span>(<span class="hljs-number">33</span>);    <span class="hljs-comment">// IntVec(33)是一个右值</span><br>cout &lt;&lt; <span class="hljs-string">&quot;ended assigning rvalue...\n&quot;</span>;<br></code></pre></td></tr></table></figure>
+
+<p>这里虽然是自定义的类的右值，但是可以代表一般情况，也就是我们创建了一个临时的右值，例如数字，字符，字符串等，然后赋值给一个变量。我们会得到这样的输出。</p>
+<figure class="highlight delphi"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs delphi">assigning rvalue...<br>[<span class="hljs-number">0</span>x28ff08] <span class="hljs-function"><span class="hljs-keyword">constructor</span></span><br><span class="hljs-function">[0<span class="hljs-title">x28fef8</span>] <span class="hljs-title">copy</span> <span class="hljs-title">assignment</span> <span class="hljs-title">operator</span></span><br><span class="hljs-function">[0<span class="hljs-title">x28fec8</span>] <span class="hljs-title">copy</span> <span class="hljs-title">constructor</span></span><br><span class="hljs-function">[0<span class="hljs-title">x28fec8</span>] <span class="hljs-title">destructor</span></span><br><span class="hljs-function">[0<span class="hljs-title">x28ff08</span>] <span class="hljs-title">destructor</span></span><br><span class="hljs-function"><span class="hljs-title">ended</span> <span class="hljs-title">assigning</span> <span class="hljs-title">rvalue</span>...</span><br></code></pre></td></tr></table></figure>
+
+<p>这里就多了一些步骤了，首先调用构造方法构造了一个临时IntVec对象，这个对象是右值。然后用&#x3D;号重载将这个对象赋值给v2，但由于这个对象是右值，它是不可更改的，因此就还是和上面一样，再构造一个左值tmp储存数据，然后再通过swap才能将数据最终给v2。然后将tmp和临时对象都析构。</p>
+<p>我们可以看到，为了将这个右值赋值给左值v2，我们在内存中创建了两个一模一样的对象，这完全是没有必要的。所以说，有没有什么办法，可以直接将临时变量赋值给v2呢？</p>
+<p>因此，就出现了右值引用。右值引用是对右值的引用，用&amp;&amp;表示，我们可以在IntVec类的声明里再加入一个方法，用来重载参数是右值时的&#x3D;号。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs cpp">IntVec&amp; <span class="hljs-keyword">operator</span>=(Intvec&amp;&amp; other)<br>&#123;<br>    <span class="hljs-built_in">log</span>(<span class="hljs-string">&quot;move assignment operator&quot;</span>);<br>    std::<span class="hljs-built_in">swap</span>(m_size, other.m_size);<br>    std::<span class="hljs-built_in">swap</span>(m_data, other.m_data);<br>    <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>借助右值引用可以为IntVec类添加移动构造方法，这样当使用该类的右值对象（可以理解为临时对象）初始化同类对象时，编译器会优先选择移动构造函数。这时other是一个右值引用，我们可以直接将右值的值复制到当前的对象中，而不用再通过tmp进行中转。而且在调用结束后，右值引用就会被销毁。得到的输出是。</p>
+<figure class="highlight delphi"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs delphi">assigning rvalue...<br>[<span class="hljs-number">0</span>x28ff08] <span class="hljs-function"><span class="hljs-keyword">constructor</span></span><br><span class="hljs-function">[0<span class="hljs-title">x28fef8</span>] <span class="hljs-title">move</span> <span class="hljs-title">assignment</span> <span class="hljs-title">operator</span></span><br><span class="hljs-function">[0<span class="hljs-title">x28ff08</span>] <span class="hljs-title">destructor</span></span><br><span class="hljs-function"><span class="hljs-title">ended</span> <span class="hljs-title">assigning</span> <span class="hljs-title">rvalue</span>...</span><br></code></pre></td></tr></table></figure>
+
+<p>这样一来，少了一次对象的创建和析构的过程，减少了内存的占用和运行时间。由于将一个右值赋值给了v2，移动赋值操作符被调用。虽然IntVec(33)仍然会创建一个临时对象，调用其构造器和析构器，但赋值操作符中的另一个临时对象不会再创建了。这个赋值操作符直接将右值的内部内容和自己的相交换，自己获得右值的内容，然后右值的析构器会销毁自己原先的内容，而这一内容已经不需要了。</p>
+<p>右值引用和std::move()方法密不可分，我会在另一篇文章中介绍std::move()方法。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/C/">#C++</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>C++中的左值和右值</div>
+      <div>http://example.com/2023/01/03/cpp-lr-value/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Changan NIU</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年1月3日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/01/03/cpp-std-move/" title="cpp-std-move">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">cpp-std-move</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/12/25/NL-and-PL/" title="NL and PL">
+                        <span class="hidden-mobile">NL and PL</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

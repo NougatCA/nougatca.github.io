@@ -17,16 +17,16 @@
   <meta name="keywords" content="">
   
     <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
+<meta property="og:title" content="nougatca的博客">
 <meta property="og:url" content="http://example.com/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="nougatca的博客">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="Changan NIU">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>Hexo</title>
+  <title>nougatca的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -224,15 +224,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2023/01/03/hello-world/" target="_self">
-          Hello World
+        <a href="/2023/01/03/cpp-std-move/" target="_self">
+          cpp-std-move
         </a>
       </h1>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/01/03/hello-world/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/01/03/cpp-std-move/" target="_self">
         <div>
-          Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick
+          在右值引用的文章中，我们知道，借助右值引用可以为指定类添加移动构造函数，这样当使用该类的右值对象（可以理解为临时对象）初始化同类对象时，编译器会优先选择移动构造函数。 注意，移动构造函数的调用时机是：用同类的右值对象初始化新对象。那么，用当前类的左值对象（有名称，能获取其存储地址的实例对象）初始化同类对象时，是否就无法调用移动构造函数了呢？当然不是，C++11标准中已经给出了解决方案，即调用mov
         </div>
       </a>
 
@@ -240,12 +240,59 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2023-01-03 12:26" pubdate>
+            <time datetime="2023-01-03 17:55" pubdate>
               2023-01-03
             </time>
           </div>
         
         
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/C/">#C++</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2023/01/03/cpp-lr-value/" target="_self">
+          C++中的左值和右值
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/01/03/cpp-lr-value/" target="_self">
+        <div>
+          左值和右值C++中有左值（lvalue）和右值（rvalue），简单来说，左值是一个对象的引用，而右值是一个值。 左值是一个表达式，它产生一个对象的引用，比如变量名，一个数组下标的引用，一个解除引用后的指针（dereferenced pointer），或一个返回方法引用的方法调用。左值在内存中必定存在一个确定的位置，从而我们可以得到它的地址。 右值是不是左值的表达式，例如literals，大部分操
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-01-03 14:18" pubdate>
+              2023-01-03
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/C/">#C++</a>
+            
+          </div>
         
       </div>
     </article>
@@ -280,6 +327,13 @@
         
         
         
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Software-Engineering-Source-Code/">#Software Engineering, Source Code</a>
+            
+          </div>
+        
       </div>
     </article>
   </div>
@@ -312,6 +366,13 @@
           </div>
         
         
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Software-Engineering-Paper/">#Software Engineering, Paper</a>
+            
+          </div>
         
       </div>
     </article>
