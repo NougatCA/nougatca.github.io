@@ -1,0 +1,664 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CNs" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Changan NIU">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="https:&#x2F;&#x2F;www.chakray.com&#x2F;programming-languages-types-and-features&#x2F;: 自然语言是人们说的语言，而编程语言是为了机器设计的。Natural language is the language spoken by people, while programming language is intended for machines. 这两种">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NL and PL">
+<meta property="og:url" content="http://example.com/2021/12/25/NL-and-PL/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="https:&#x2F;&#x2F;www.chakray.com&#x2F;programming-languages-types-and-features&#x2F;: 自然语言是人们说的语言，而编程语言是为了机器设计的。Natural language is the language spoken by people, while programming language is intended for machines. 这两种">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-12-25T07:40:10.000Z">
+<meta property="article:modified_time" content="2023-01-03T06:10:15.442Z">
+<meta property="article:author" content="Changan NIU">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>NL and PL - Hexo</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Chang&#39;an</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Startseite</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archiv</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Kategorien</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Schlagwörter</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>Über</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="NL and PL"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-12-25 15:40" pubdate>
+          December 25, 2021 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          13k wörter
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          106 minuten
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">NL and PL</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p><a target="_blank" rel="noopener" href="https://www.chakray.com/programming-languages-types-and-features/">https://www.chakray.com/programming-languages-types-and-features/</a>:</p>
+<p>自然语言是人们说的语言，而编程语言是为了机器设计的。<br>Natural language is the language spoken by people, while programming language is intended for machines.</p>
+<p>这两种语言都包含重要的相似之处，例如它们在语法和语义之间的区分，它们的交流目的和基本构成的存在。<br>Both languages contain important similarities, such as the differentiation they make between syntax and semantics, their purpose to communicate and the existence of a basic composition.</p>
+<p>这两种类型是为了交流思想、表达和指示而产生的。<br>The two types were created to communicate ideas, expressions, and instructions.</p>
+<p>编程语言更严格，也更不宽容。自然语言有内在的冗余，允许利用上下文来解决一些歧义。<br>the latter is stricter and less tolerant than the former. This happens because human languages have a built-in redundancy that allows some ambiguity to be resolved using context.</p>
+<p>编程语言几乎没有冗余，否则就很容易陷入歧义，而无法指出正确的命令。<br>On the other hand, programming languages have practically no redundancy, otherwise, it would be very easy to fall into ambiguity and not indicate the correct command.</p>
+<p>编程语言更严格的原因是计算机喜欢接受精确的指令，此外，机器没有能力像人一样澄清表达的含义。<br>The fact that programming languages are stricter in this regard is due to the fact that computers are very precise in the instructions they like to receive. In addition, machines do not have the ability to clarify the meaning of an expression as a human being would.</p>
+<p>为了避免混淆，编程语言是固定的和封闭的，而自然语言是开放的，允许组合而不会有同样的出错风险。<br>It is also essential that programming languages are fixed and closed to avoid confusion, while natural languages are open and allow combinations without the same risk of making mistakes.</p>
+<p>编程语言有意向特性，就是自然性，这意味着它在其设计领域的应用必须自然地进行，为操作者提供操作符、结构和语言，以便有效地工作。<br>Naturalness: this means that its application in the area for which it was designed must be done naturally, providing operators, structures and syntax for operators to work efficiently.</p>
+<p><a target="_blank" rel="noopener" href="https://www.quora.com/Whats-the-difference-between-natural-languages-and-programming-languages">https://www.quora.com/Whats-the-difference-between-natural-languages-and-programming-languages</a>:</p>
+<p>Daniel Ross:</p>
+<p>编程语言是确定的，明确的，毫不含糊的，而自然语言是多歧义的，往往是多重含糊的，需要在上下文中解释才能完全理解，<strong>这也是机器很难理解自然语言的原因</strong>。自然语言是富含创造性的，其允许诗歌，隐喻或者其它解释，编程语言确实允许在风格上有一些变化，但含义并不灵活。<br>Programming languages are unambiguous, while natural languages are often multiply ambiguous and require interpretation in context to be fully understood (also why it’s so hard to get machines to understand them). Natural languages are also creative and allow poetry, metaphor and other interpretations. Programming does allow some variation in style, but the meaning is not flexible.</p>
+<p>自然语言由句子组成，通常是陈述性的句子，以序列的方式表达信息。编程语言通常不是陈述性的，而是程序性的，向机器发出指令去做一些事情（像自然语言中的命令）。很少有编程语言是陈述性的<br>Natural languages consist of sentences, usually declarative sentences expressing information in a sequence. Programming languages typically are not declarative but procedural, giving instructions to the machine to do something (like commands in natural languages). Rarely, programming languages are declarative</p>
+<p>自然语言的词汇充满了概念性的术语。编程语言的词汇通常只有 “语法”&#x2F;功能 “词”，如基本注释，加上各种自定义命名的东西，如变量和函数。没有像你在字典里查到的表达 “爱 “或 “快乐 “或 “唱歌 “的词。<br>The vocabulary of natural languages is filled with conceptual terms. The vocabulary of programming languages is generally only ‘grammatical’&#x2F;functional ‘words’ like basic comments, plus various custom-named things like variables and functions. There are no words like you’d look up in a dictionary to express something like ‘love’ or ‘happy’ or ‘sing’.</p>
+<p>语法结构的变化比在这里列出的要多。但一些最明显的因素是，在编程语言中，单词没有可分离的部分（如英语cat-s组成复数）（&#x3D;没有形态）<em>（注：但是编程语言中有另一种可分离的形式，就是自定义的标识符，驼峰&#x2F;下划线命名法）</em>，而且通过括号、换行符或其他标记，嵌入往往在编程语言的两边都有明显的标记，而口语通常只有一个词（如 “that”）连接嵌入的句子，有时甚至没有词。这也是在计算机上解析人类语言如此困难的另一个原因。<br>The grammatical structures vary in more ways than are easy to list here. But some of the most obvious factors are that words don’t have separable parts in programming languages (like English cat-s to form a plural) [&#x3D;no morphology], and that via brackets, line breaks or other markers, embedding tends to be overtly and clearly marked on both sides for the parser in programming languages, whereas spoken languages usually only have one word (like “that”) linking embedded sentences, and sometimes no word at all. This is another reason that parsing human languages is so hard on a computer.</p>
+<p>在一个非常普遍的意义上，编程语言并不用于双向交流，而且可能不适合被视为与自然语言相同意义上的 “语言”。<br>In a very general sense, programming languages aren’t used for bidirectional communication and may not properly be considered “languages” in the same sense as natural languages.</p>
+<p>最根本的是，值得一问的是，编程语言是否有意义，或者它们是否只是指令。这类似于中国房间的思想实验–给你一本关于如何翻译中文的说明，但没有真正理解它，拿着这本书的人（或计算机）会被认为 “知道 “中文吗？可能不会。计算机并不 “了解 “任何东西，它只是做指令所要求的。因此，编程语言没有语义&#x2F;意义。它们只是指令，可以转化为电子信号，仅此而已。<br>Most fundamentally, it is worth asking if programming languages even have meaning, or if they are just instructions. This is similar to the Chinese room thought experiment— given a book of instructions for how to translate Chinese, but without actually understanding it, would a human (or computer) with that book be considered to “know” Chinese? Probably not. A computer doesn’t “know” anything, it just does what the instructions tell it to. Therefore, programming languages have no semantics&#x2F;meaning. They just are instructions, which translate into electronic signals, nothing more.<br><em>注：可以理解为，编程语言本身没有任何语义，但是人们在编写编程语言的时候，人工赋予了这一段代码一些语义信息，例如变量名，对于计算机而言，变量名确实只是一个符号，而对于阅读这段代码的人来说，变量名确实给了他一定的语义信息。因此，对于应用NLP方法真正理解这段代码来说，利用代码里的语义信息，是否是个正确的选择。</em></p>
+<p>Torben Ægidius Mogensen: </p>
+<p>编程语言是先验的，而自然语言根据其使用情况而定义。<br>programming languages are specified a priori, where natural languages are described based on their usage.</p>
+<p>这有几个后果。其一是自然语言中一个短语的含义可能不会被普遍认同，甚至可能随着时间的推移而改变。在编程语言中，一个短语的含义只有一个（如果语言设计者做得好的话），而且通常不会随着时间的推移而改变–新的结构体可能会被添加，但旧的结构体很少会改变含义。<br>This has several consequences: One is that the meaning of a phrase in natural language may not be universally agreed upon, and may even change over time. The meaning of a phrase in a programming language has only one meaning (if the language designers did their job well), and it will usually not change over time — new constructs may be added, but old constructs rarely change meaning.</p>
+<p>前面的一个答案说，编程语言是为了让机器理解而设计的。我并不同意。编程语言是为人们阅读和书写而设计的，在机器能够理解它们之前需要进行翻译。我们不使用自然语言为计算机编程的主要原因是，人类在用自然语言毫不含糊地、精确地表达自己方面是出了名的糟糕。<br>One of the earlier answers said that programming languages are designed to be understood by machines. I do not agree: Programming languages are designed for people to read and write, and need to be translated before machines can understand them. The main reason we do not use natural language to program computers is that humans are notoriously bad at expressing themselves unambiguously and precisely in natural languages.</p>
+<p><a target="_blank" rel="noopener" href="https://www.quora.com/What-are-the-fundamental-differences-between-a-human-language-and-a-computer-language">https://www.quora.com/What-are-the-fundamental-differences-between-a-human-language-and-a-computer-language</a>:</p>
+<p>Bruce Richardson:</p>
+<p>人类语言比编程语言更复杂。句法和语法更复杂，语义更细微，词汇量大得多。<br>Human languages are more complex than programming languages. The syntax and grammar is more complex, the semantics more nuanced, the vocabulary much larger.</p>
+<p>Greg Kemnitz:</p>
+<p>除了形式化语法之类的技术方面，计算机语言没有外部环境。<br>In addition to the technical aspects of formal grammars and such things, a computer language has no external context.</p>
+<p>人类的语言充满了寓言、类比以及历史和文化参考，使一个短语或一个词能够承载巨大的意义。你如何用计算机语言表达 “跨越卢比肯河”、”咬苹果”、”红色药丸 “或 “我有一个梦想”？<br>A human language is full of allegory, analogy, and historical and cultural references that allow a short phrase or a word to carry vast weight of meaning. How do you express “crossing the Rubicon”, “biting the apple”, “the red pill”, or “I have a dream” in a computer language?</p>
+<p>一个计算机程序必须是完全自我定义的。与 “类比 “或 “引用 “最接近的可能是操作系统服务或计算机程序使用但不试图实现的外部工具，但即使是这样，该服务也必须在计算机程序的操作环境中完全实现和定义好，否则它就没有功能。<br>A computer program must be completely self-defining. The closest equivalent to “analogies’ or “references” might be OS services or external utilities that the computer program uses but does not attempt to implement, but even there, the service must be completely implemented and well-defined in the operating environment of the computer program, or it is nonfunctional.</p>
+<p><a target="_blank" rel="noopener" href="https://medium.com/@anaharris/human-languages-vs-programming-languages-c89410f13252">https://medium.com/@anaharris/human-languages-vs-programming-languages-c89410f13252</a>:</p>
+<p>我们已经从上一段中得到了这个信息，但让我们再重复一遍：语言的主要功能，无论是Python还是中文，都是交流。这是它们之间最重要的相似之处，也是我们把它们都称为语言的主要原因之一。<br>We already got this from the previous paragraph, but let’s repeat it again: the main function of languages, be it Python or Chinese, is communication. This is the most important similarity between them, and one of the main reasons we refer to both of them as languages.</p>
+<p>它们的另一个重要的共同特征是结构。语言学中的两个主要概念是语义学和句法。<br>Another important feature that they have in common is structure. Two of the main concepts in linguistics are semantics and syntax.</p>
+<p>语义学指的是某个词的含义，或者说是与某个概念相关的信息。例如，吃这个词适用于生物体能做的特定动作。<br>Semantics refers to the meaning of a certain word, or rather an information connected to a certain concept. For example, a word eat applies to a specific action living organisms can do.</p>
+<p>另一方面，句法是一套规则，告诉我们如何安排和组合单词和短语。<br>Syntax, on the other hand, is a set of rules that tell us how to arrange and combine words and phrases.</p>
+<p>两者紧密相连，只有结合在一起才能创造出一个功能齐全的表达。以一个句子 “床吃东西 “为例：虽然从语法的角度看它是正确的，但从语义上看它是错误的，因为床没有生命，所以不能吃东西。<br>The two are closely intwined and only together can create a fully functioning expression. Take a sentence Bed eats as an example: while it’s correct from the point of view of a syntax, semantically it’s wrong since a bed is not alive and therefore cannot eat.</p>
+<p>与自然语言类似，编程语言也区分了语法和语义。每一种编程语言都是以某种想法或意图为基础编写的（语义），同时遵循围绕变量、函数、不同种类的括号、冒号等的使用规则。(语法）。<br>Similarly to natural languages, programming languages distinguish between syntax and semantics. Every programming language is written with a certain idea or intention in mind (semantics) while following the set of rules around the use of variables, functions, different kinds of parenthesis, colons, etc. (syntax).</p>
+<p>同样重要的是要指出，这两种语言都形成了语系，或者说是由一个个相关语言组成的群体。我们都听说过印欧语系，它包括英语和其他许多语言。编程语言也有自己的语言家族，其语法和&#x2F;或语义相对相似。<br>It is also important to point out that both form language families, or groups of related languages that branch one from another. We all have heard of the Indo-European language family, that includes English, among many other languages. Programming languages have their own families of language with relatively similar syntax and&#x2F;or semantics.</p>
+<p>在谈到语言的结构时，我们不要忘记提到形态学。语态学是研究单词、它们的形成、它们与同一语言中其他单词的关系，以及语境改变一个单词的发音和含义的方式。虽然形态学在人类语言的分析中起着非常重要的作用，但我们真的不能说编程语言有类似的东西。<br>While speaking about the structure of languages, let’s not forget to mention morphology. Morphology is the study of words, their formation, their relationship with other words in the same language, as well as the ways context can change a word’s pronunciation and meaning. While morphology plays a very important role in the analysis of human languages, we can’t really say that programming languages have anything similar to it.</p>
+<p>首先，编程语言是人工创造的。这意味着它们所有的规则和定义都是事先设计好的，这使得它们可以被完整地描述和研究。它们的语法是自我定义的，而且不会因上下文而改变。这样想吧：每一行代码要么是零，要么是一个意思（换句话说，它要么包含一个错误，要么是一个你可以运行的有效程序）。没有同义词（尽管Ruby的.map和.collect可以被看作是同义词，例如）、寓言、比喻、历史或文化参考。正因为如此，编程语言并没有真正的形态学，至少没有像人类语言那样。<br>First of all, programming languages are artificial creations. This means that all of their rules and definitions were designed beforehand, which allows for them to be fully described and studied in their entirety. Their grammar is self-defining, and it doesn’t change depending on the context. Think about it this way: every line of code has either zero or one meaning (in other words, it either contains an error or it’s a valid program you can run). There are no synonyms (although Ruby’s .map and .collect could be seen as synonyms, for example), allegories, analogies, historical or cultural references. Because of this, programming languages don’t really have morphology, at least not the same way human languages do.</p>
+<p>第二，由于它们遵循非常严格的规则，编程语言不能像人类语言那样进化和发展（尽管我们可以说编程语言是通过各种库进化的）。没有错误或即兴发挥的空间。另一方面，人类语言充满了不完善之处。只要想想方言、俚语、行话、论语（某个群体使用的、外人无法理解的秘密语言）、命名、口音、发音错误的单词、打字错误、不规则的标点符号以及人类语言的许多其他方面，都不会破坏我们要传达的信息。<br>Second, due to the fact that they follow very strict set of rules, programming languages can’t evolve and develop the same way human languages do (although we could say that programming languages evolve through various libraries). There’s no room for errors or improvisation. On the other hand, human languages are full of imperfections. Just think of dialects, slang, jargon, argot (secret language used by a certain group that’s incomprehensible to outsiders), namesake, accents, mispronounced words, typos, irregular punctuation and many other aspects of human languages that don’t disrupt the message we’re trying to communicate.</p>
+<p>而人类语言所传达的信息既是逻辑的，也是情感的。如果是口语，它涉及身体语言、语调、音量和许多其他非语言线索。事实上，语言在很大程度上是由人类身体的物理属性（眼睛、舌头、手）来定义的，也正因为如此，它是人类独有的。这些都不适用于编程语言。尽管技术高超的程序员可以开发出他们自己的代码编写风格，但代码的性质仍然是一样的：逻辑性强、精确、完全不含糊。这并不令人惊讶，因为所有编程语言的基础是数十亿的1和0。<br>And the message human languages communicate is both logical and emotional. If spoken, it involves body language, intonation, volume, and many other nonverbal clues. In fact, languages are much defined by the physical attributes of human bodies (eyes, tongue, hands), and are for that reason unique to humans. None of these applies to programming languages. Although highly skilled programmers can develop their own styles of writing code, the nature of that code remains the same: logical, precise, perfectly unambiguous. Which shouldn’t come as a surprise, since the foundation of all programming languages are billions and billions of 1s and 0s.</p>
+<p><a target="_blank" rel="noopener" href="https://technologyguider.com/what-is-difference-between-programming-language-and-natural-language/">https://technologyguider.com/what-is-difference-between-programming-language-and-natural-language/</a>:</p>
+<p>在语法方面，这些语言也是彼此不同的。编程措辞不遵循任何语法规则。这个概念只存在于人类身上。<br>These languages are also different from one another in the case of grammar. Programming wording does not follow any of the grammar rules. This concept is only in humans. </p>
+<p>如果有人想在编程中实现语法，那么代码将无法工作，因为计算机不理解人在说什么。<br>If anyone wanted to implement grammar in programming then the code will not work because the computer is not understanding that what a person is saying.</p>
+<p>编程的句子不依赖于语法，只有人类的句子才依赖于语法。<br>Programming sentences are not dependent on grammar only humans’ sentences are dependent on it.</p>
+<p>就句子而言，它是自然语言的唯一概念。在编程语言中，没有句子的概念。因为所有的信息都是由几个词覆盖的。如果你在一行中写一个大的代码，使其成为一个句子，那么它将无法工作。<br>In the case of sentences, it is the only concept of natural languages. In programming languages, there is no concept of sentences. Because all the information is covered by few words. If you will write a big code in one line to make it a sentence then it will not work.</p>
+<p><a target="_blank" rel="noopener" href="http://meetrajesh.com/posts/natural-vs-programming-languages.html">http://meetrajesh.com/posts/natural-vs-programming-languages.html</a>:</p>
+<p>这两种形式在非常基本的层面上仍然是语言，而不仅仅是名称上。它们在本质上都是为了实现一个目标而创造的：交流。特别是，交流思想和表达方式。在某些情况下，还有指令。<br>The two forms are still languages at a very fundamental level, not just by name. They were both essentially created to achieve one goal: to communicate. In particular, to communicate ideas and expressions. And in some cases, instructions.</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>NL and PL</div>
+      <div>http://example.com/2021/12/25/NL-and-PL/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Beitragsautor</div>
+          <div>Changan NIU</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Veröffentlicht am</div>
+          <div>December 25, 2021</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Urheberrechtshinweis</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/01/03/hello-world/" title="Hello World">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">Vorheriger</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/08/29/threats-to-validity/" title="浅谈Threats to Validity">
+                        <span class="hidden-mobile">浅谈Threats to Validity</span>
+                        <span class="visible-mobile">Nächster</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Inhaltsverzeichnis</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Suchen</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Stichwort</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog funktioniert am besten mit aktiviertem JavaScript</div>
+  </noscript>
+</body>
+</html>
