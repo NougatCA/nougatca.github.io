@@ -1,0 +1,671 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Changan NIU">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="最近在学习LLVM的前端，我是跟着LLVM的官方教程学习的，这个教程通过一个很简单的，虚构的编程语言Kaleidoscope来教你一步步实现自己的编程语言以及对应的编译器。 Kaleidoscope语言Kaleidoscope是一个程序性语言，简单起见，我们规定Kaleidoscope中的数字类型仅有双精度浮点数类型，因此也无需进行类型声明。这样Kaleidoscope就有了很简单的语法，下面的例">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译器中的Lexer">
+<meta property="og:url" content="http://nougatca.github.io/2023/01/03/llvm-lexer/index.html">
+<meta property="og:site_name" content="nougatca的博客">
+<meta property="og:description" content="最近在学习LLVM的前端，我是跟着LLVM的官方教程学习的，这个教程通过一个很简单的，虚构的编程语言Kaleidoscope来教你一步步实现自己的编程语言以及对应的编译器。 Kaleidoscope语言Kaleidoscope是一个程序性语言，简单起见，我们规定Kaleidoscope中的数字类型仅有双精度浮点数类型，因此也无需进行类型声明。这样Kaleidoscope就有了很简单的语法，下面的例">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-01-03T14:47:19.000Z">
+<meta property="article:modified_time" content="2023-01-04T04:41:57.077Z">
+<meta property="article:author" content="Changan NIU">
+<meta property="article:tag" content="Compiler">
+<meta property="article:tag" content="LLVM">
+<meta property="article:tag" content="Lexer">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>编译器中的Lexer - nougatca的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"nougatca.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":"§"},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Chang&#39;an</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="编译器中的Lexer"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-01-03 22:47" pubdate>
+          2023年1月3日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          44 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">编译器中的Lexer</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>最近在学习LLVM的前端，我是跟着LLVM的<a target="_blank" rel="noopener" href="https://llvm.org/docs/tutorial/index.html">官方教程</a>学习的，这个教程通过一个很简单的，虚构的编程语言Kaleidoscope来教你一步步实现自己的编程语言以及对应的编译器。</p>
+<h1 id="Kaleidoscope语言"><a href="#Kaleidoscope语言" class="headerlink" title="Kaleidoscope语言"></a>Kaleidoscope语言</h1><p>Kaleidoscope是一个程序性语言，简单起见，我们规定Kaleidoscope中的数字类型仅有双精度浮点数类型，因此也无需进行类型声明。这样Kaleidoscope就有了很简单的语法，下面的例子是Kaleidoscope写成的斐波那契数列方法。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs cpp"># Compute the x<span class="hljs-number">&#x27;</span>th fibonacci number.<br><span class="hljs-function">def <span class="hljs-title">fib</span><span class="hljs-params">(x)</span></span><br><span class="hljs-function">  <span class="hljs-keyword">if</span> x &lt; 3</span><br><span class="hljs-function">    <span class="hljs-keyword">return</span> 1</span><br><span class="hljs-function">  <span class="hljs-keyword">else</span></span><br><span class="hljs-function">    <span class="hljs-keyword">return</span> <span class="hljs-title">fib</span><span class="hljs-params">(x<span class="hljs-number">-1</span>)</span>+<span class="hljs-title">fib</span><span class="hljs-params">(x<span class="hljs-number">-2</span>)</span></span><br><span class="hljs-function"></span><br><span class="hljs-function"># This expression will compute the 40th number.</span><br><span class="hljs-function"><span class="hljs-title">fib</span><span class="hljs-params">(<span class="hljs-number">40</span>)</span></span><br></code></pre></td></tr></table></figure>
+
+<p>此外，我们还允许Kaleidoscope调用标准库中的方法，之后的LLVM JIT会使实现这个功能变得非常简单。Kaleidoscope通过关键字<code>extern</code>在使用之前定义一个方法（在手动定义递归方法中也有用），下面是一个例子。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"># 声明三个标准库中的方法<br><span class="hljs-function"><span class="hljs-keyword">extern</span> <span class="hljs-title">sin</span><span class="hljs-params">(arg)</span></span>;<br><span class="hljs-function"><span class="hljs-keyword">extern</span> <span class="hljs-title">cos</span><span class="hljs-params">(arg)</span></span>;<br><span class="hljs-function"><span class="hljs-keyword">extern</span> <span class="hljs-title">atan2</span><span class="hljs-params">(arg1 arg2)</span></span>;<br><br><span class="hljs-built_in">atan2</span>(<span class="hljs-built_in">sin</span>(<span class="hljs-number">.4</span>), <span class="hljs-built_in">cos</span>(<span class="hljs-number">42</span>))<br></code></pre></td></tr></table></figure>
+
+<p>这里我们可以基本上理解了Kaleidoscope语言的基本语法，下面就开始实现这个语言的第一步，词法分析器。</p>
+<h1 id="词法分析器，Lexer"><a href="#词法分析器，Lexer" class="headerlink" title="词法分析器，Lexer"></a>词法分析器，Lexer</h1><p>首先介绍一下编译器编译代码的第一步，词法分析器，Lexer。</p>
+<p>词法分析器处理编程语言的代码文本，并理解这些文本表达了什么。词法分析器lexer（也称为scanner），将代码文本识别成一系列token，每个token被识别为一个编程语言中的定义，例如关键字，标识符，literal等。每个token包含一个token的代码以及可能的一些信息（例如，如果该token是一个数字，那么包含的信息还有这个数字的值）。</p>
+<p>下面，我们将所有可能出现的token类型进行枚举。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// 词法分析器如果遇到识别不了的字符，那么返回该字符的ASCII码，即[0-255]</span><br><span class="hljs-comment">// 如果是可以识别的类型，那么返回下面定义的负数。</span><br><span class="hljs-keyword">enum</span> <span class="hljs-title class_">Token</span><br>&#123;<br>    tok_eof = <span class="hljs-number">-1</span>,   <span class="hljs-comment">// end of file</span><br><br>    <span class="hljs-comment">// 关键字</span><br>    tok_def = <span class="hljs-number">-2</span>,<br>    tok_if = <span class="hljs-number">-3</span>,<br>    tok_else = <span class="hljs-number">-4</span>,<br>    tok_return = <span class="hljs-number">-5</span>,<br><br>    <span class="hljs-comment">// 主要类型</span><br>    tok_identifier = <span class="hljs-number">-6</span>,<br>    tok_number = <span class="hljs-number">-7</span>,<br><br>    <span class="hljs-comment">// 注释</span><br>    tok_comment = <span class="hljs-number">-8</span><br>&#125;;<br><br><span class="hljs-type">static</span> std::string identifier_str;  <span class="hljs-comment">// 如果识别为identifier，那么将它的文本储存到这里</span><br><span class="hljs-type">static</span> <span class="hljs-type">double</span> num_val;              <span class="hljs-comment">// 如果识别为数字，那么将其值储存到这里</span><br><span class="hljs-type">static</span> std::string comment_line;    <span class="hljs-comment">// 如果识别为注释，那么将注释字符串储存到这里</span><br></code></pre></td></tr></table></figure>
+
+<p>Lexer返回的每个token只有两种情况，一是上面枚举类型中存在的负数，二是不能识别的字符，例如”+”，这时lexer返回的是该字符的ASCII码值，范围为0-255。</p>
+<p>如果识别到标识符identifier，那么我们将该标识符的名称赋值给<code>identifier_str</code>。如果识别到数字，那么我们将该数字表示的值赋值给<code>num_val</code>。如果识别到注释行，那么我们将注释的字符串赋值给<code>comment_line</code>。注意这里我们简单起见，使用的是全局变量来储存这些值，但这并不是一个好的选择，在真实的编译器实现中，显然不会用这个方法。</p>
+<p>Lexer的实现是通过一个方法<code>get_tok</code>实现的，它持续读取代码文本的下一个字符，直到识别到下一个token并返回。下面我们通过一个简单的实现对这个方法进行解释。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// 返回的是int值，如果是负数，则是之前定一个Token枚举类型中的值</span><br><span class="hljs-comment">// 如果是正数，则是未识别的字符的ASCII码</span><br><span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title">get_tok</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-comment">// 读取到的字符</span><br>    <span class="hljs-type">static</span> <span class="hljs-type">int</span> last_char = <span class="hljs-string">&#x27; &#x27;</span>;<br>    <span class="hljs-comment">// 通过getchar()方法从标准输入中一次读取一个字符</span><br>    <span class="hljs-comment">// 首先是跳过所有的空白字符</span><br>    <span class="hljs-keyword">while</span> (<span class="hljs-built_in">isspace</span>(last_char))<br>        last_char = <span class="hljs-built_in">getchar</span>();<br><br>    <span class="hljs-comment">// 然后是识别标识符，并判断是不是关键字</span><br>    <span class="hljs-comment">// 标识符identifier的正则: [a-zA-Z][a-zA-Z0-9_]*</span><br>    <span class="hljs-comment">// 标识符仅由字母，数字和下划线组成，并由字母开头</span><br>    <span class="hljs-comment">// isalpha判断当前字符是否是字母</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isalpha</span>(last_char))<br>    &#123;<br>        <span class="hljs-comment">// 全局变量identifier_str储存标识符的名称</span><br>        identifier_str = last_char;<br>        last_char = <span class="hljs-built_in">getchar</span>();<br>        <span class="hljs-comment">// isalnum判断是否是字母或数字</span><br>        <span class="hljs-comment">// 符合标识符命名的情况下，持续读取</span><br>        <span class="hljs-keyword">while</span> (<span class="hljs-built_in">isalnum</span>(last_char) || last_char == <span class="hljs-string">&#x27;_&#x27;</span>)<br>        &#123;<br>            <span class="hljs-comment">// 将下一个字符拼接到标识符名称后</span><br>            identifier_str += last_char;<br>            <span class="hljs-comment">// 读取下一个字符</span><br>            last_char = <span class="hljs-built_in">getchar</span>();<br>        &#125;<br><br>        <span class="hljs-comment">// 判断识别到的标识符是否是关键字</span><br>        <span class="hljs-comment">// 如果是关键字，则返回关键字对应的token id</span><br>        <span class="hljs-keyword">if</span> (identifier_str == <span class="hljs-string">&quot;def&quot;</span>)<br>            <span class="hljs-keyword">return</span> tok_def;<br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (identifier_str == <span class="hljs-string">&quot;if&quot;</span>)<br>            <span class="hljs-keyword">return</span> tok_if;<br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (identifier_str == <span class="hljs-string">&quot;else&quot;</span>)<br>            <span class="hljs-keyword">return</span> tok_else;<br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (identifier_str == <span class="hljs-string">&quot;return&quot;</span>)<br>            <span class="hljs-keyword">return</span> tok_return;<br>        <span class="hljs-comment">// 如果不是关键字，则表明是自定义标识符，返回identifier的id</span><br>        <span class="hljs-comment">// 这时自定义的标识符的名字则储存在全局变量identifier_str中</span><br>        <span class="hljs-keyword">return</span> tok_identifier;<br>    &#125;<br><br>    <span class="hljs-comment">// 然后是数字，简单起见，我们将这里的数字的正则定义为[0-9.]+</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isdigit</span>(last_char) || last_char == <span class="hljs-string">&#x27;.&#x27;</span>)<br>    &#123;<br>        <span class="hljs-comment">// num_str用来储存数字值的字符串</span><br>        std::string num_str;<br>        <span class="hljs-keyword">do</span><br>        &#123;<br>            num_str += last_char;<br>            last_char = <span class="hljs-built_in">getchar</span>();<br>        &#125;<br>        <span class="hljs-keyword">while</span> (<span class="hljs-built_in">isdigit</span>(last_char) || last_char == <span class="hljs-string">&#x27;.&#x27;</span>);<br>        <br>        <span class="hljs-comment">// 接下来需要将用字符表示的值转换为双精度浮点值</span><br>        <span class="hljs-comment">// strtod是C标准库中的方法，将str转换为双精度浮点值</span><br>        num_val = <span class="hljs-built_in">strtod</span>(num_str.<span class="hljs-built_in">c_str</span>(), <span class="hljs-literal">nullptr</span>);<br>        <span class="hljs-comment">// 返回数字的id，同时数字的值被储存在全局变量num_val中</span><br>        <span class="hljs-keyword">return</span> tok_number;<br><br>        <span class="hljs-comment">// 由于我们简单起见将数字定义为[0-9.]+，这会导致一个问题</span><br>        <span class="hljs-comment">// 就是这也会识别例如1.23.4.5这样的序列，这在strtod方法后只会保留前面有效的部分，即1.23，这是不对的</span><br>        <span class="hljs-comment">// 因此在真正实现时还要考虑这一点，例如限制小数点只能识别到一次等</span><br>    &#125;<br><br>    <span class="hljs-comment">// 接下来是注释，之前我们也了解到Kaleidoscope语言的注释仅有行注释，而没有块注释，行注释由#号开始</span><br>    <span class="hljs-comment">// 因此当识别到#时，表示接下来的一行都是注释</span><br>    <span class="hljs-keyword">if</span> (last_char == <span class="hljs-string">&#x27;#&#x27;</span>)<br>    &#123;<br>        comment_line = last_char;<br>        <span class="hljs-keyword">do</span><br>        &#123;<br>            last_char = <span class="hljs-built_in">getchar</span>();<br>            comment_line += last_char;<br>        &#125;<br>        <span class="hljs-keyword">while</span> (last_char != EOF &amp;&amp; last_char != <span class="hljs-string">&#x27;\n&#x27;</span> &amp;&amp; last_char != <span class="hljs-string">&#x27;\r&#x27;</span>);<br>        <span class="hljs-comment">// 只要不识别到文件结束，或者换行，则都是注释的内容</span><br>        <span class="hljs-comment">// 最后将注释的id返回，此时注释的内容储存在全局变量comment_line中</span><br>        <span class="hljs-keyword">return</span> tok_comment;<br>    &#125;<br><br>    <span class="hljs-comment">// 判断是否是到了文件结束</span><br>    <span class="hljs-keyword">if</span> (last_char == EOF)<br>        <span class="hljs-keyword">return</span> tok_eof;<br><br>    <span class="hljs-comment">// 如果当前字符串不是Token枚举类中列出的，则将其ASCII码返回</span><br>    <span class="hljs-type">int</span> this_char = last_char;<br>    last_char = <span class="hljs-built_in">getchar</span>();<br>    <span class="hljs-keyword">return</span> this_char;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>到这里我们就完成了一个简单的lexer的核心，get_tok方法。我们在外面再写一个驱动，用于循环调用get_tok方法，并接受它的输出，对它识别到的每一个token进行我们需要的处理，下面我们写一个简单的方法，将get_tok方法读取到的token输出。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>)<br>    &#123;<br>        <span class="hljs-type">int</span> res = <span class="hljs-built_in">get_tok</span>();<br>        <span class="hljs-keyword">if</span> (res == tok_def || res == tok_if || res == tok_else || res == tok_return)<br>        &#123;<br>            std::cout &lt;&lt; <span class="hljs-string">&quot;Keywords: &quot;</span> &lt;&lt; identifier_str &lt;&lt; std::endl;<br>        &#125;<br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (res == tok_identifier)<br>        &#123;<br>            std::cout &lt;&lt; <span class="hljs-string">&quot;Identifier: &quot;</span> &lt;&lt; identifier_str &lt;&lt; std::endl;<br>        &#125;<br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (res == tok_number)<br>        &#123;<br>            std::cout &lt;&lt; <span class="hljs-string">&quot;Number: &quot;</span> &lt;&lt; num_val &lt;&lt; std::endl;<br>        &#125;<br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (res == tok_comment)<br>        &#123;<br>            std::cout &lt;&lt; <span class="hljs-string">&quot;Comment line: &quot;</span> &lt;&lt; comment_line &lt;&lt; std::endl;<br>        &#125;<br>        <span class="hljs-keyword">else</span><br>        &#123;<br>            std::cout &lt;&lt; <span class="hljs-string">&quot;Unknown char: &quot;</span> &lt;&lt; <span class="hljs-built_in">char</span>(res) &lt;&lt; std::endl;<br>        &#125;<br><br>        <span class="hljs-keyword">if</span> (res == EOF)<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这时我们将上面的斐波那契数列的Kaleidoscope实现作为输入，就可以得到下面的输出。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs sh">Comment line: <span class="hljs-comment"># Compute the x&#x27;th fibonacci number.</span><br><br>Keywords: def<br>Identifier: fib<br>Unknown char: (<br>Identifier: x<br>Unknown char: )<br>Keywords: <span class="hljs-keyword">if</span><br>Identifier: x<br>Unknown char: &lt;<br>Number: 3<br>Keywords: <span class="hljs-built_in">return</span><br>Number: 1<br>Keywords: <span class="hljs-keyword">else</span><br>Keywords: <span class="hljs-built_in">return</span><br>Identifier: fib<br>Unknown char: (<br>Identifier: x<br>Unknown char: -<br>Number: 1<br>Unknown char: )<br>Unknown char: +<br>Identifier: fib<br>Unknown char: (<br>Identifier: x<br>Unknown char: -<br>Number: 2<br>Unknown char: )<br>Comment line: <span class="hljs-comment"># This expression will compute the 40th number.</span><br><br>Identifier: fib<br>Unknown char: (<br>Number: 40<br>Unknown char: )<br></code></pre></td></tr></table></figure>
+
+<p>到这里我们就实现了一个简单的词法分析器，接下来，就到了parser和AST的实现了。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Compiler/" class="category-chain-item">Compiler</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Compiler/">#Compiler</a>
+      
+        <a href="/tags/LLVM/">#LLVM</a>
+      
+        <a href="/tags/Lexer/">#Lexer</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>编译器中的Lexer</div>
+      <div>http://nougatca.github.io/2023/01/03/llvm-lexer/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Changan NIU</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年1月3日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/01/03/code-ptms/" title="代码预训练模型总结">
+                        <span class="hidden-mobile">代码预训练模型总结</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
