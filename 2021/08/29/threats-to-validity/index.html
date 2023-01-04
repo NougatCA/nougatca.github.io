@@ -23,15 +23,15 @@
 <meta property="og:site_name" content="nougatca的博客">
 <meta property="og:description" content="软件工程领域里的很多论文在最后都会有Threats to Validity，之前读论文的时候都是一眼带过。自己曾经写过，也是随便写写。前几天写论文写到这一章，仔细去看了一些论文，发现这也分很多种类。搜了一下，发现还有一篇论文是专门对这个的研究。所以在这里就依据这篇论文做一个总结吧。由于现在我的研究方向是机器学习，所以就结合这个方向进行讨论。这些都是我所理解的，可能不严谨，也可能不正确。 作者首先强">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://nougatca.github.io/images/threats/internal_validity.gif">
-<meta property="og:image" content="http://nougatca.github.io/images/threats/construct_validity.gif">
+<meta property="og:image" content="http://nougatca.github.io/img/posts/threats/internal_validity.gif">
+<meta property="og:image" content="http://nougatca.github.io/img/posts/threats/construct_validity.gif">
 <meta property="article:published_time" content="2021-08-29T06:39:07.000Z">
-<meta property="article:modified_time" content="2023-01-03T14:17:05.305Z">
+<meta property="article:modified_time" content="2023-01-04T11:10:11.618Z">
 <meta property="article:author" content="Changan NIU">
 <meta property="article:tag" content="Software Engineering">
 <meta property="article:tag" content="Paper Writing">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://nougatca.github.io/images/threats/internal_validity.gif">
+<meta name="twitter:image" content="http://nougatca.github.io/img/posts/threats/internal_validity.gif">
   
   
   
@@ -285,9 +285,9 @@
 <p>举个例子，如果你通过统计一些数据发现学校中参加某一个项目的学生成绩都很高，其他学生的成绩都很低。结论有效性就是根据这些数据就得出这样结论的合理性。也许参加这个项目并不是原因而是结果（可能参加项目的门槛就是成绩优秀），也许这些学生本来就比对照组聪明，这就导致了结论的不合理性。</p>
 <p>在机器学习中，大部分时间就是在提出一个新的方法，通过实验来证明这种方法可以达到更好的效果。这本质上也是在证明你提出的方法和更好的结果之间存在必然的关系。所以，这时结论有效性就应该讨论你所提出的方法是否是导致更好效果的原因。也就是说，到底是你提出的方法导致结果变好，还是有可能是由于其它的原因导致结果变好。</p>
 <p>不过在机器学习中，这个类别不是经常被讨论，因为你可以通过消融实验(ablation study)来证明你提出的方法的有效性。</p>
-<h2 id="Internal-Validity"><a href="#Internal-Validity" class="headerlink" title="Internal Validity"></a>Internal Validity</h2><p>内部有效性就是说采用方法的内部的有效性，所以，讨论内部有效性的前提是，已经有证据证明所采用的方法对最终的结果有影响。有人说结论有效性是内部有效性的特例，但是当它们两个分开的时候，内部有效性更多地关注于方法内部。下图就形象地表达了内部有效性。<br><img src="/images/threats/internal_validity.gif" srcset="/img/loading.gif" lazyload></p>
+<h2 id="Internal-Validity"><a href="#Internal-Validity" class="headerlink" title="Internal Validity"></a>Internal Validity</h2><p>内部有效性就是说采用方法的内部的有效性，所以，讨论内部有效性的前提是，已经有证据证明所采用的方法对最终的结果有影响。有人说结论有效性是内部有效性的特例，但是当它们两个分开的时候，内部有效性更多地关注于方法内部。下图就形象地表达了内部有效性。<br><img src="/img/posts/threats/internal_validity.gif" srcset="/img/loading.gif" lazyload alt="内部有效性"></p>
 <p>机器学习中的内部有效性最常见的是超参数的设置了，超参数的不同可能会导致结果的偏差。这也很好理解，你提出了新的方法，或者改进，你实现的方法和别人实现的方法肯定不完全相同。就算你是在某个方法上进行的更改，那么你也不能保证其它对比的方法都是在一个代码上进行的更改。所以，你用了你的方法，同时也引入了其它的不可预期的变量。有时候看似你的方法，模型效果很好，但可能是超参数的原因。除非你有大规模的调参，或者在所有的实验上，包括对比方法的参数、技巧（例如warmup等提分的技巧）都设置成一模一样（通常来说不太可能实现），那么内部有效性都会超参数这一项。</p>
-<h2 id="Construct-Validity"><a href="#Construct-Validity" class="headerlink" title="Construct Validity"></a>Construct Validity</h2><p>在论文中，我们都会基于一个理论，提出一种方法，然后通过对这个方法观测到的结果，来进行推论，从基于的这个理论，推理到结果所基于的理论。因此就会存在两种结界：第一种是观测到的结界，从提出的方法到观测到的实验结果；另一种是理论的结界，从提出方法基于的理论到结果的理论。通过下图可以很直观地看到。<br><img src="/images/threats/construct_validity.gif" srcset="/img/loading.gif" lazyload></p>
+<h2 id="Construct-Validity"><a href="#Construct-Validity" class="headerlink" title="Construct Validity"></a>Construct Validity</h2><p>在论文中，我们都会基于一个理论，提出一种方法，然后通过对这个方法观测到的结果，来进行推论，从基于的这个理论，推理到结果所基于的理论。因此就会存在两种结界：第一种是观测到的结界，从提出的方法到观测到的实验结果；另一种是理论的结界，从提出方法基于的理论到结果的理论。通过下图可以很直观地看到。<br><img src="/img/posts/threats/construct_validity.gif" srcset="/img/loading.gif" lazyload alt="结构有效性"></p>
 <p>我们所能保证的是下面的，观测到的是真实的，但是无法保证你所说明的，基于观测到的理论的完全正确性，包括两个结界之间的联系，以及理论中Cause Construct到Effect Construct的推论是否正确。所以，结构有效性关注的就是你所基于的，解释的理论是否是正确的。</p>
 <p>例如，你为了证明一个新的学习桌对小学生的成绩有提升的作用，你为它们换上了学习桌。这么看来你所做的改变仅仅是书桌，而最终的结果也证明了你的猜想。但是有可能是你错了，学生成绩提高的原因是它得到了更多的关注。所以，你虽然改变的仅仅是书桌，但是改变书桌所带来的其它不可预期的变化，可能导致你得出错误的结论。</p>
 <p>机器学习中，举一个例子就是我如果用自监督学习来提高某一个任务的性能。最后实验也证明了使用自监督学习可以提升结果。但是自监督使用的数据集里面包括了下游任务的测试集中的数据，那么这就叫结构有效性。</p>
