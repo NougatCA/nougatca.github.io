@@ -18,7 +18,7 @@
   
     <meta name="description" content="LLVM IR (Intermediate Representation)，是LLVM所使用的代码表示。我们都知道LLVM把整个编译过程分为三个部分，前端（frontend），编译优化，后端（frontend）。这是LLVM针对不同的源代码和不同的目标架构所使用的低耦合解决办法，前端负责将不同的编程语言写成的代码转换为统一的表示，然后编译优化部分进行优化，最后针对不同的平台，再使用不同的后端生成对">
 <meta property="og:type" content="article">
-<meta property="og:title" content="llvm-ir-tutorial">
+<meta property="og:title" content="LLVM IR 教程（未完）">
 <meta property="og:url" content="http://nougatca.github.io/2023/02/07/llvm-ir-tutorial/index.html">
 <meta property="og:site_name" content="nougatca的博客">
 <meta property="og:description" content="LLVM IR (Intermediate Representation)，是LLVM所使用的代码表示。我们都知道LLVM把整个编译过程分为三个部分，前端（frontend），编译优化，后端（frontend）。这是LLVM针对不同的源代码和不同的目标架构所使用的低耦合解决办法，前端负责将不同的编程语言写成的代码转换为统一的表示，然后编译优化部分进行优化，最后针对不同的平台，再使用不同的后端生成对">
@@ -30,7 +30,7 @@
 <meta property="og:image" content="http://nougatca.github.io/img/posts/llvm-ir/implicit-label.png">
 <meta property="og:image" content="http://nougatca.github.io/img/posts/llvm-ir/implicit-label-error.png">
 <meta property="article:published_time" content="2023-02-07T02:52:30.000Z">
-<meta property="article:modified_time" content="2023-02-08T08:34:25.931Z">
+<meta property="article:modified_time" content="2023-02-14T16:11:47.598Z">
 <meta property="article:author" content="Changan NIU">
 <meta property="article:tag" content="Compiler">
 <meta property="article:tag" content="LLVM">
@@ -40,7 +40,7 @@
   
   
   
-  <title>llvm-ir-tutorial - nougatca的博客</title>
+  <title>LLVM IR 教程（未完） - nougatca的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -206,7 +206,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="llvm-ir-tutorial"></span>
+            <span id="subtitle" data-typed-text="LLVM IR 教程（未完）"></span>
           
         </div>
 
@@ -240,7 +240,7 @@
         
         
         
-          74 分钟
+          73 分钟
         
       </span>
     
@@ -278,13 +278,13 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">llvm-ir-tutorial</h1>
+            <h1 style="display: none">LLVM IR 教程（未完）</h1>
             
             
               <div class="markdown-body">
                 
                 <p>LLVM IR (Intermediate Representation)，是LLVM所使用的代码表示。我们都知道LLVM把整个编译过程分为三个部分，前端（frontend），编译优化，后端（frontend）。这是LLVM针对不同的源代码和不同的目标架构所使用的低耦合解决办法，前端负责将不同的编程语言写成的代码转换为统一的表示，然后编译优化部分进行优化，最后针对不同的平台，再使用不同的后端生成对应的机器码。这样，编译优化部分就不需要随着编程语言和目标平台进行调整。而前端所生成的统一表示，就是LLVM IR。IR是源代码的完整表示，所以我们只需要IR就可以替代源代码，不需要其他的任何信息。</p>
-<p>这篇文章我会简单介绍一下IR，主要参考的是在(2019 EuroLLVM Developers’ Meeting)[<a target="_blank" rel="noopener" href="https://llvm.org/devmtg/2019-04/]%E4%B8%8A%EF%BC%8CV">https://llvm.org/devmtg/2019-04/]上，V</a>. Bridgers和F. Piovezan带来的教程”LLVM IR Tutorial - Phis, GEPs …”。</p>
+<p>这篇文章我会简单介绍一下IR，主要参考的是在<a target="_blank" rel="noopener" href="https://llvm.org/devmtg/2019-04/">2019 EuroLLVM Developers’ Meeting</a>上，V. Bridgers和F. Piovezan带来的教程”LLVM IR Tutorial - Phis, GEPs …”。</p>
 <h1 id="什么是IR"><a href="#什么是IR" class="headerlink" title="什么是IR"></a>什么是IR</h1><p>IR是一种低级编程语言，它有着像RISC的指令集。同时，它与例如汇编之类的语言不同的是，IR可以表达高层次的想法，也就是说，高级编程语言可以非常清楚，确定地映射到IR上。同时，他的设计还有利于编译器进行优化。</p>
 <h1 id="IR的表现形式"><a href="#IR的表现形式" class="headerlink" title="IR的表现形式"></a>IR的表现形式</h1><p>IR的表示形式有三种，一种是基于二进制的位码（bitcode），文件后缀为bc。第二种是有利于人们阅读的形式，文件后缀是ll。第三种是LLVM在编译和优化IR时的，在内存时的中间形式，这个设计是LLVM之所以编译快的一个重要原因，它的每一步不需要生成中间文件，而是直接在内存中生成中间形式。</p>
 <p>也就是说，我们可以看到的IR的形式就是两种，文件后缀为bc和ll的表示。我们可以通过命令得到这两种格式的文件。</p>
@@ -420,7 +420,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>llvm-ir-tutorial</div>
+      <div>LLVM IR 教程（未完）</div>
       <div>http://nougatca.github.io/2023/02/07/llvm-ir-tutorial/</div>
     </div>
     <div class="license-meta">
