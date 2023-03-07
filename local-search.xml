@@ -8,7 +8,7 @@
     <link href="/2023/03/06/build-llvm-from-source/"/>
     <url>/2023/03/06/build-llvm-from-source/</url>
     
-    <content type="html"><![CDATA[<p>由于需要在CentOS 7的服务器上安装LLVM和Clang的环境，因此在这里记录一下整个过程。</p><h1 id="GCC"><a href="#GCC" class="headerlink" title="GCC"></a>GCC</h1><p>编译LLVM需要GCC版本大于5.1，而CentOS 7的版本是4.8.5，因此需要首先升级一下GCC版本。这里有两种方法，一种是yum，一种是从源码编译安装。</p><h2 id="yum升级GCC"><a href="#yum升级GCC" class="headerlink" title="yum升级GCC"></a>yum升级GCC</h2><p>yum无法直接升级GCC版本，而是需要我们通过其他命令，顺带着将GCC升级，命令如下</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">yum install centos-release-scl<br>yum install devtoolset-7<br></code></pre></td></tr></table></figure><p>之后，如果想要在当前session下生效，需要</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">scl enable devtoolset-7 bash<br>source /opt/rh/devtoolset-7/enable<br></code></pre></td></tr></table></figure><p>如果想要永久生效，那么需要</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo &quot;source /opt/rh/devtoolset-7/enable&quot; &gt;&gt; ~/.bashrc <br>source /opt/rh/devtoolset-7/enable<br></code></pre></td></tr></table></figure><p>然后用<code>gcc -v</code>查看版本，已经升级到了7.3.1。</p><h2 id="源码编译安装"><a href="#源码编译安装" class="headerlink" title="源码编译安装"></a>源码编译安装</h2><p>我们首先去GCC镜像网站上找想装的版本：<a href="https://gcc.gnu.org/mirrors.html%E3%80%82%E4%BE%8B%E5%A6%82%E6%88%91%E4%BB%AC%E6%83%B3%E8%A6%81%E8%A3%8512.2.0%E7%89%88%E6%9C%AC%EF%BC%8C%E7%84%B6%E5%90%8E%E6%89%BE%E4%B8%80%E4%B8%AA%E7%A6%BB%E5%BE%97%E8%BF%91%E7%9A%84%E9%95%9C%E5%83%8F%EF%BC%9Ahttp://ftp.tsukuba.wide.ad.jp/software/gcc/releases/%E3%80%8212.2.0%E7%89%88%E6%9C%AC%E7%9A%84%E9%93%BE%E6%8E%A5%E5%A6%82%E4%B8%8B%EF%BC%9Ahttp://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-12.2.0/gcc-12.2.0.tar.gz%E3%80%82">https://gcc.gnu.org/mirrors.html。例如我们想要装12.2.0版本，然后找一个离得近的镜像：http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/。12.2.0版本的链接如下：http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-12.2.0/gcc-12.2.0.tar.gz。</a></p><p>我们先下载这个包，然后解压，安装。</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell">wget http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-12.2.0/gcc-12.2.0.tar.gz<br>tar zxf gcc-12.2.0.tar.gz<br>cd gcc-12.2.0<br>./contrib/download_prerequisites<br>mkdir build<br>cd build<br>../configure -prefix=/usr/local/gcc-12.2.0 --enable-checking=release --enable-languages=c,c++ --disable-multilib<br>make all<br>make install<br></code></pre></td></tr></table></figure><p>然后修改环境变量：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo &quot;PATH=/usr/local/gcc-12.2.0/bin:$PATH&quot; &gt;&gt; ~/.bashrc<br></code></pre></td></tr></table></figure><p>之后<code>source ~/.bashrc</code>，然后用<code>gcc -v</code>查看是否安装成功。</p><h1 id="CMAKE"><a href="#CMAKE" class="headerlink" title="CMAKE"></a>CMAKE</h1><p>安装LLVM还需要cmake，cmake的安装比较简单，直接去官网下载二进制文件即可：<a href="https://cmake.org/download/%E3%80%82">https://cmake.org/download/。</a><br>例如</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">wget https://github.com/Kitware/CMake/releases/download/v3.25.2/cmake-3.25.2-linux-x86_64.sh<br>sh cmake-3.25.2-linux-x86_64.sh<br></code></pre></td></tr></table></figure><p>加入cmake安装到了<code>/root/cmake</code>下，那么我们修改环境变量“</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo &quot;PATH=/root/cmake/bin:$PATH&quot; &gt;&gt; ~/.bashrc<br></code></pre></td></tr></table></figure><p>之后<code>source ~/.bashrc</code>。这样就安装好了。</p><h1 id="LLVM"><a href="#LLVM" class="headerlink" title="LLVM"></a>LLVM</h1><p>先去GitHub挑选合适的版本，这里使用的是13.0.1。先把源码下下来，解压安装。</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell">wget https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-13.0.1.tar.gz<br>tar -zxf llvmorg-13.0.1.tar.gz<br>cd llvm-org-xxxx<br>mkdir build<br>cd build<br>cmake -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS=&quot;clang&quot; -G &quot;Unix Makefiles&quot; ../llvm<br>make    # 这一步十分耗时，建议放后台跑<br>make install<br></code></pre></td></tr></table></figure><p>然后就安装成功了，试一下各种命令，例如<code>clang --version</code>, <code>opt --version</code>, <code>llvm-link --verison</code>.</p>]]></content>
+    <content type="html"><![CDATA[<p>由于需要在CentOS 7的服务器上安装LLVM和Clang的环境，因此在这里记录一下整个过程。</p><h1 id="GCC"><a href="#GCC" class="headerlink" title="GCC"></a>GCC</h1><p>编译LLVM需要GCC版本大于5.1，而CentOS 7的版本是4.8.5，因此需要首先升级一下GCC版本。这里有两种方法，一种是yum，一种是从源码编译安装。</p><h2 id="yum升级GCC"><a href="#yum升级GCC" class="headerlink" title="yum升级GCC"></a>yum升级GCC</h2><p>yum无法直接升级GCC版本，而是需要我们通过其他命令，顺带着将GCC升级，命令如下</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">yum install centos-release-scl<br>yum install devtoolset-7<br></code></pre></td></tr></table></figure><p>之后，如果想要在当前session下生效，需要</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">scl enable devtoolset-7 bash<br>source /opt/rh/devtoolset-7/enable<br></code></pre></td></tr></table></figure><p>如果想要永久生效，那么需要</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo &quot;source /opt/rh/devtoolset-7/enable&quot; &gt;&gt; ~/.bashrc <br>source /opt/rh/devtoolset-7/enable<br></code></pre></td></tr></table></figure><p>然后用<code>gcc -v</code>查看版本，已经升级到了7.3.1。</p><h2 id="源码编译安装"><a href="#源码编译安装" class="headerlink" title="源码编译安装"></a>源码编译安装</h2><p>我们首先去GCC镜像网站上找想装的版本：<a href="https://gcc.gnu.org/mirrors.html%E3%80%82%E4%BE%8B%E5%A6%82%E6%88%91%E4%BB%AC%E6%83%B3%E8%A6%81%E8%A3%8512.2.0%E7%89%88%E6%9C%AC%EF%BC%8C%E7%84%B6%E5%90%8E%E6%89%BE%E4%B8%80%E4%B8%AA%E7%A6%BB%E5%BE%97%E8%BF%91%E7%9A%84%E9%95%9C%E5%83%8F%EF%BC%9Ahttp://ftp.tsukuba.wide.ad.jp/software/gcc/releases/%E3%80%8212.2.0%E7%89%88%E6%9C%AC%E7%9A%84%E9%93%BE%E6%8E%A5%E5%A6%82%E4%B8%8B%EF%BC%9Ahttp://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-12.2.0/gcc-12.2.0.tar.gz%E3%80%82">https://gcc.gnu.org/mirrors.html。例如我们想要装12.2.0版本，然后找一个离得近的镜像：http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/。12.2.0版本的链接如下：http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-12.2.0/gcc-12.2.0.tar.gz。</a></p><p>我们先下载这个包，然后解压，安装。</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell">wget http://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-12.2.0/gcc-12.2.0.tar.gz<br>tar zxf gcc-12.2.0.tar.gz<br>cd gcc-12.2.0<br>./contrib/download_prerequisites<br>mkdir build<br>cd build<br>../configure -prefix=/usr/local/gcc-12.2.0 --enable-checking=release --enable-languages=c,c++ --disable-multilib<br>make all<br>make install<br></code></pre></td></tr></table></figure><p>然后修改环境变量：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo &quot;PATH=/usr/local/gcc-12.2.0/bin:$PATH&quot; &gt;&gt; ~/.bashrc<br></code></pre></td></tr></table></figure><p>之后<code>source ~/.bashrc</code>，然后用<code>gcc -v</code>查看是否安装成功。</p><h1 id="CMAKE"><a href="#CMAKE" class="headerlink" title="CMAKE"></a>CMAKE</h1><p>安装LLVM还需要cmake，cmake的安装比较简单，直接去官网下载二进制文件即可：<a href="https://cmake.org/download/%E3%80%82">https://cmake.org/download/。</a><br>例如</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">wget https://github.com/Kitware/CMake/releases/download/v3.25.2/cmake-3.25.2-linux-x86_64.sh<br>sh cmake-3.25.2-linux-x86_64.sh<br></code></pre></td></tr></table></figure><p>假如cmake安装到了<code>/root/cmake-3.25.2-linux-x86_64</code>下，那么我们修改环境变量“</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">echo &quot;PATH=/root/cmake-3.25.2-linux-x86_64/bin:$PATH&quot; &gt;&gt; ~/.bashrc<br></code></pre></td></tr></table></figure><p>之后<code>source ~/.bashrc</code>。这样就安装好了。</p><h1 id="LLVM"><a href="#LLVM" class="headerlink" title="LLVM"></a>LLVM</h1><p>先去GitHub挑选合适的版本，这里使用的是13.0.1。先把源码下下来，解压安装。</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell">wget https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-13.0.1.tar.gz<br>tar -zxf llvmorg-13.0.1.tar.gz<br>cd llvm-org-xxxx<br>mkdir build<br>cd build<br>cmake -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS=&quot;clang&quot; -G &quot;Unix Makefiles&quot; ../llvm<br>make    # 这一步十分耗时，建议放后台跑<br>make install<br></code></pre></td></tr></table></figure><p>然后就安装成功了，试一下各种命令，例如<code>clang --version</code>, <code>opt --version</code>, <code>llvm-link --verison</code>.</p>]]></content>
     
     
     <categories>
@@ -45,9 +45,9 @@
     
     <tags>
       
-      <tag>Compiler</tag>
-      
       <tag>LLVM</tag>
+      
+      <tag>Compiler</tag>
       
       <tag>IR</tag>
       
@@ -74,9 +74,9 @@
     
     <tags>
       
-      <tag>Compiler</tag>
-      
       <tag>LLVM</tag>
+      
+      <tag>Compiler</tag>
       
       <tag>Parser</tag>
       
@@ -105,9 +105,9 @@
     
     <tags>
       
-      <tag>Compiler</tag>
-      
       <tag>LLVM</tag>
+      
+      <tag>Compiler</tag>
       
       <tag>Lexer</tag>
       
@@ -211,9 +211,9 @@
     
     <tags>
       
-      <tag>Software Engineering</tag>
-      
       <tag>Discussion</tag>
+      
+      <tag>Software Engineering</tag>
       
       <tag>Source Code</tag>
       
@@ -242,9 +242,9 @@
     
     <tags>
       
-      <tag>Paper Writing</tag>
-      
       <tag>Software Engineering</tag>
+      
+      <tag>Paper Writing</tag>
       
     </tags>
     
