@@ -1,0 +1,316 @@
+@font-face {
+  font-family: "Linux Libertine";
+  src: url("/fonts/linux-libertine/LinLibertine_R.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Linux Libertine";
+  src: url("/fonts/linux-libertine/LinLibertine_RB.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Linux Libertine";
+  src: url("/fonts/linux-libertine/LinLibertine_RI.woff") format("woff");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Linux Libertine";
+  src: url("/fonts/linux-libertine/LinLibertine_RBI.woff") format("woff");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Source Han Serif SC";
+  src: url("/fonts/SourceHanSerifSC/SourceHanSerifSC-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Source Han Serif SC";
+  src: url("/fonts/SourceHanSerifSC/SourceHanSerifSC-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Latin glyphs come from Linux Libertine; CJK glyphs fall through to Source Han Serif SC. */
+body {
+  font-family: "Linux Libertine", "Source Han Serif SC", serif;
+  width: calc(100% - 2rem);
+  max-width: 960px;
+  margin: 2rem auto;
+}
+
+/* Auto-insert a thin gap between CJK and Latin/digits (render-only; text is unchanged). */
+html[lang="zh-CN"] body {
+  text-autospace: normal;
+}
+
+/* Intro: info on the left, random photo on the right. The photo is as tall as the
+   info block and keeps its own aspect ratio; the caption hangs below it. */
+.intro {
+  display: flex;
+  gap: 2rem;
+  align-items: stretch;
+  margin-bottom: 1.8rem;
+}
+
+.intro-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.intro-info h1 {
+  margin-top: 0;
+}
+
+.photo-card {
+  flex: 0 0 420px;
+  position: relative;
+  margin: 0;
+}
+
+.photo-frame,
+.photo-frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.photo-frame img {
+  object-fit: contain;
+  object-position: right top;
+}
+
+.photo-card figcaption {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  white-space: nowrap;
+  font-size: 0.85em;
+  color: #555;
+  margin-top: 0.4rem;
+}
+
+@media (max-width: 700px) {
+  .intro {
+    flex-direction: column;
+    margin-bottom: 0;
+  }
+
+  .photo-card {
+    flex-basis: auto;
+  }
+
+  .photo-frame,
+  .photo-frame img {
+    position: static;
+    height: auto;
+    max-height: 60vh;
+  }
+
+  .photo-frame img {
+    width: auto;
+    max-width: 100%;
+  }
+
+  .photo-card figcaption {
+    position: static;
+  }
+}
+
+body > nav {
+  margin-bottom: 1.8rem;
+}
+
+/* About */
+.timeline {
+  list-style: none;
+  padding-left: 0;
+}
+
+.timeline li {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.timeline .period {
+  flex: none;
+  min-width: 8.3em;
+  color: #555;
+}
+
+/* Start and end dates sit in fixed-width columns joined by a dash. */
+.timeline span.period:has(.start) {
+  display: grid;
+  grid-template-columns: 3.3em 1.2em 3.8em;
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline .dash {
+  text-align: center;
+}
+
+/* Publications */
+.pub-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.pub {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+.pub-number {
+  flex: none;
+  min-width: 2.2em;
+  color: #555;
+}
+
+.pub-body {
+  min-width: 0;
+}
+
+.pub-title {
+  font-weight: 400;
+}
+
+.pub-venue {
+  font-style: italic;
+}
+
+.pub-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.15rem;
+}
+
+.pub-head:empty {
+  display: none;
+}
+
+.pub-abbr {
+  font-weight: 700;
+  font-style: italic;
+}
+
+.pub-badge {
+  padding: 0 0.4rem;
+  font-size: 0.8em;
+  color: #555;
+  border: 1px solid #999;
+  border-radius: 3px;
+}
+
+.pub-badge.pub-award {
+  color: #fff;
+  background: #d4a017;
+  border-color: #d4a017;
+}
+
+/* Chinese page only: fixed height so CJK and Latin badge text (different fallback fonts) match. */
+html[lang="zh-CN"] .pub-badge {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 1.6em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.pub-badge.ccf-A {
+  color: #b3261e;
+  border-color: #b3261e;
+}
+
+.pub-badge.ccf-B {
+  color: #1b7a3a;
+  border-color: #1b7a3a;
+}
+
+.pub-badge.ccf-C {
+  color: #1c5fa8;
+  border-color: #1c5fa8;
+}
+
+.pub-link,
+.pub-copy {
+  margin-left: 0.6rem;
+  font-size: 0.9em;
+}
+
+.pub-copy {
+  font-family: inherit;
+  padding: 0 0.4rem;
+  cursor: pointer;
+}
+
+.pub details {
+  margin-top: 0.3rem;
+  font-size: 0.9em;
+}
+
+.pub summary {
+  cursor: pointer;
+  color: #555;
+}
+
+
+/* Headed items: no bullets or indent; spacing and the bold heading separate them. */
+.topics {
+  list-style: none;
+  padding-left: 0;
+}
+
+.topics li {
+  margin-bottom: 1rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+section {
+  scroll-margin-top: 1rem;
+}
+
+/* Marker in front of every main section title. */
+.section-title::before {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-right: 0.45em;
+  background: #4d0099;
+  vertical-align: 0.08em;
+}
+
+.section-nav {
+  margin: 1.5rem 0 0.5rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.section-nav .sep {
+  color: #999;
+  margin: 0 0.2em;
+}

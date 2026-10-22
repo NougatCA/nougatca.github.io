@@ -1,0 +1,143 @@
+---
+import type { Lang } from "../data/profile";
+import { publicationsConfig as config } from "../config/publications";
+import { getPublications, groupPublications } from "../lib/publications";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const groups = groupPublications(getPublications());
+
+const flat = config.groupBy === "none";
+
+// Numbers follow the display order, starting from 1.
+const numbers = new Map(groups.flatMap((g) => g.items).map((p, i) => [p.id, i + 1]));
+
+const L = config.labels;
+
+function pdfOf(fields: Record<string, string>): string | undefined {
+  const value = fields[config.pdf.field];
+  if (!value) return undefined;
+  if (/^(https?:)?\/\//.test(value) || value.startsWith("/")) return value;
+  return `/${config.pdf.dir}/${value.replace(/^\.?\//, "")}`;
+}
+
+function arxivOf(fields: Record<string, string>): string | undefined {
+  const value = fields[config.arxiv.field];
+  if (!value) return undefined;
+  return /^https?:\/\//.test(value) ? value : `https://arxiv.org/abs/${value.replace(/^arxiv:/i, "")}`;
+}
+
+function linkOf(fields: Record<string, string>): string | undefined {
+  for (const s of config.link.sources) {
+    if (fields[s.field]) return (s.prefix ?? "") + fields[s.field];
+  }
+}
+---
+
+{
+  groups.map((group) => (
+    <div class="pub-group">
+      {!flat && <h3>{group.titles[lang]}</h3>}
+      <ul class="pub-list">
+        {group.items.map((pub) => (
+          <li class="pub">
+            {config.numbered && <span class="pub-number">[{numbers.get(pub.id)}]</span>}
+            <div class="pub-body">
+              <div class="pub-head">
+                {config.head.map((item) => {
+                  if (item === "abbr") return pub.abbr && <span class="pub-abbr">{pub.abbr}</span>;
+                  const typeLabel = pub.venueType && L[pub.venueType][lang];
+                  if (item === "ccf") {
+                    const text = [pub.ccf && `CCF-${pub.ccf}`, typeLabel].filter(Boolean).join(" · ");
+                    return text && <span class={`pub-badge ${pub.ccf ? `ccf-${pub.ccf}` : ""}`}>{text}</span>;
+                  }
+                  if (item === "type") return typeLabel && <span class="pub-badge">{typeLabel}</span>;
+                  return pub.fields[item] && <span class="pub-badge pub-award">{pub.fields[item]}</span>;
+                })}
+              </div>
+              <span class="pub-citation">
+                {config.fields.map((f) => {
+                  if (f.name === "authors") {
+                    return pub.authors.length > 0 ? (
+                      <Fragment>
+                        {f.before}
+                        <span class="pub-authors">
+                          {pub.authors.map((a, i) => (
+                            <Fragment>
+                              {i > 0 && (i === pub.authors.length - 1 ? " and " : ", ")}
+                              {a.highlight ? <strong>{a.name}</strong> : a.name}
+                            </Fragment>
+                          ))}
+                        </span>
+                        {f.after}
+                      </Fragment>
+                    ) : null;
+                  }
+                  const text = pub.fields[f.name];
+                  return text ? (
+                    <Fragment>
+                      {f.before}
+                      <span class={`pub-${f.name}`}>{text}</span>
+                      {f.after}
+                    </Fragment>
+                  ) : null;
+                })}
+              </span>
+              {pdfOf(pub.fields) && (
+                <a class="pub-link" href={pdfOf(pub.fields)} target="_blank" rel="noopener">
+                  {config.pdf.label[lang]}
+                </a>
+              )}
+              {arxivOf(pub.fields) && (
+                <a class="pub-link" href={arxivOf(pub.fields)} target="_blank" rel="noopener">
+                  {config.arxiv.label[lang]}
+                </a>
+              )}
+              {linkOf(pub.fields) && (
+                <a class="pub-link" href={linkOf(pub.fields)} target="_blank" rel="noopener">
+                  {config.link.label[lang]}
+                </a>
+              )}
+              {config.showBibtex && pub.bibtex && (
+                <button type="button" class="pub-copy" data-bibtex={pub.bibtex} data-copied={L.copied[lang]}>
+                  {L.bibtex[lang]}
+                </button>
+              )}
+              {config.showAbstract && pub.fields.abstract && (
+                <details>
+                  <summary>{L.abstract[lang]}</summary>
+                  <p>{pub.fields.abstract}</p>
+                </details>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))
+}
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>(".pub-copy").forEach((btn) => {
+    const label = btn.textContent;
+    btn.addEventListener("click", async () => {
+      const text = btn.dataset.bibtex ?? "";
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        // Fallback for insecure contexts / denied clipboard permission.
+        const area = document.createElement("textarea");
+        area.value = text;
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+      }
+      btn.textContent = btn.dataset.copied ?? "Copied";
+      setTimeout(() => (btn.textContent = label), 1500);
+    });
+  });
+</script>

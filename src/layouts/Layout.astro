@@ -1,0 +1,25 @@
+---
+import "../styles/global.css";
+import { profile, type Lang } from "../data/profile";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const p = profile[lang];
+---
+
+<html lang={p.htmlLang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{p.name}</title>
+  </head>
+  <body>
+    <nav>
+      <a href="/">English</a> |
+      <a href="/zh/">中文</a>
+    </nav>
+    <slot />
+  </body>
+</html>

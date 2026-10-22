@@ -1,0 +1,37 @@
+---
+import type { Lang } from "../data/profile";
+import photos from "../data/photos.json";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const items = photos.map((p) => ({ src: `/photos/${p.file}`, caption: p[lang] }));
+const fallback = items[0];
+---
+
+{
+  fallback && (
+    <figure class="photo-card" data-photos={JSON.stringify(items)}>
+      <div class="photo-frame">
+        <img alt="" />
+        <noscript>
+          <img src={fallback.src} alt={fallback.caption} />
+        </noscript>
+      </div>
+      <figcaption>{fallback.caption}</figcaption>
+    </figure>
+    <script is:inline>
+      (function () {
+        var fig = document.currentScript.previousElementSibling;
+        var items = JSON.parse(fig.getAttribute("data-photos"));
+        var pick = items[Math.floor(Math.random() * items.length)];
+        var img = fig.querySelector(".photo-frame > img");
+        img.alt = pick.caption;
+        img.src = pick.src;
+        fig.querySelector("figcaption").textContent = pick.caption;
+      })();
+    </script>
+  )
+}

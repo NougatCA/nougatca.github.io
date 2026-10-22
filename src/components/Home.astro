@@ -1,0 +1,101 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PhotoCard from "./PhotoCard.astro";
+import Publications from "./Publications.astro";
+import { profile, type Lang } from "../data/profile";
+import { inline } from "../lib/inline";
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const p = profile[lang];
+const { about } = p;
+
+const navItems = [
+  ...about.map((b) => ({ id: b.id, title: b.title })),
+  { id: "publications", title: p.publicationsTitle },
+  { id: "related-links", title: p.relatedLinksTitle },
+];
+
+// "2021.9 - 2025.6" -> start / end, so that dates line up in columns.
+const splitPeriod = (period: string) => period.split(/\s+[-–—]\s+/, 2);
+---
+
+<Layout lang={lang}>
+  <header class="intro">
+    <div class="intro-info">
+      <h1>{p.name}</h1>
+      <p>
+        {p.affiliation.map((line) => <Fragment><Fragment set:html={inline(line)} /><br /></Fragment>)}
+        <Fragment set:html={inline(p.address)} />
+      </p>
+      <p set:html={inline(p.email)} />
+      <p class="links">
+        {p.links.map((l, i) => <Fragment>{i > 0 && " | "}<a href={l.url} target="_blank" rel="noopener">{l.label}</a></Fragment>)}
+      </p>
+    </div>
+    <PhotoCard lang={lang} />
+  </header>
+
+  <nav class="section-nav" aria-label={lang === "zh" ? "章节导航" : "Sections"}>
+    {
+      navItems.map((item, i) => (
+        <Fragment>
+          {i > 0 && <span class="sep"> | </span>}
+          <a href={`#${item.id}`}>{item.title}</a>
+        </Fragment>
+      ))
+    }
+  </nav>
+
+  {
+    about.map((block) => (
+      <section id={block.id}>
+        <h2 class="section-title">{block.title}</h2>
+        {block.paragraphs?.map((t) => <p set:html={inline(t)} />)}
+        {block.items && (
+          <ul class:list={[block.items.some((e) => e.period) && "timeline", block.items.some((e) => e.heading) && "topics"]}>
+            {block.items.map((e) => (
+              <li>
+                {e.period && (() => {
+                  const [start, end] = splitPeriod(e.period);
+                  return end ? (
+                    <span class="period">
+                      <span class="start" set:html={inline(start)} />
+                      <span class="dash">–</span>
+                      <span class="end" set:html={inline(end)} />
+                    </span>
+                  ) : (
+                    <span class="period" set:html={inline(start)} />
+                  );
+                })()}
+                <span>
+                  {e.heading && (
+                    <Fragment>
+                      <strong set:html={inline(e.heading)} />
+                      <br />
+                    </Fragment>
+                  )}
+                  <Fragment set:html={inline(e.text)} />
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    ))
+  }
+
+  <section id="publications">
+    <h2 class="section-title">{p.publicationsTitle}</h2>
+    <Publications lang={lang} />
+  </section>
+
+  <section id="related-links">
+    <h2 class="section-title">{p.relatedLinksTitle}</h2>
+    <p class="links">
+      {p.relatedLinks.map((l, i) => <Fragment>{i > 0 && " | "}<a href={l.url} target="_blank" rel="noopener">{l.label}</a></Fragment>)}
+    </p>
+  </section>
+</Layout>
