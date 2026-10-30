@@ -97,8 +97,8 @@ export const profile: Record<Lang, Profile> = {
       { label: "Nanjing University", url: "https://www.nju.edu.cn/" },
       { label: "Software Institute, Nanjing University", url: "https://software.nju.edu.cn/" },
       { label: "State Key Laboratory for Novel Software Technology", url: "https://keysoftlab.nju.edu.cn/" },
+      { label: "Language Intelligence Processing Lab (LIP Lab)", url: "https://liplab.site/index-en.html" },
       { label: "Vincent Ng", url: "https://personal.utdallas.edu/~vince/" }
-      
     ],
   },
   zh: {

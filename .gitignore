@@ -26,3 +26,5 @@ pnpm-debug.log*
 
 AGENTS.md
 CLAUDE.md
+# generated plain-text Markdown
+plain/
